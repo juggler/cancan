@@ -94,6 +94,18 @@ if ENV["MODEL_ADAPTER"] == "mongo_mapper"
         MongoMapperProject.accessible_by(@ability, :read).entries.should == [obj]
       end
 
+      it "should not modify the database" do
+        obj = MongoMapperProject.create(:bar => 1)
+        obj2 = MongoMapperProject.create(:bar => 2)
+        objects = MongoMapperProject.all
+
+        @ability.can :read, MongoMapperProject
+        @ability.cannot :read, MongoMapperProject, :bar => 2
+        entries = MongoMapperProject.accessible_by(@ability, :read).entries
+
+        MongoMapperProject.all.should == objects
+      end
+
       it "should combine the rules" do
         obj = MongoMapperProject.create(:bar => 1)
         obj2 = MongoMapperProject.create(:bar => 2)
