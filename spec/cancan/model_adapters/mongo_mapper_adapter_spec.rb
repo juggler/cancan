@@ -94,6 +94,18 @@ if ENV["MODEL_ADAPTER"] == "mongo_mapper"
         MongoMapperProject.accessible_by(@ability, :read).entries.should == [obj]
       end
 
+      it "should raise when a cannot query is complex" do
+        obj = MongoMapperProject.create(:bar => 1)
+        @ability.can :read, MongoMapperProject
+        @ability.cannot :read, MongoMapperProject, :bar.in => [1, 2]
+        lambda { MongoMapperProject.accessible_by(@ability, :read).entries }.should raise_error
+
+        @ability.can :edit, MongoMapperProject
+        @ability.cannot :edit, MongoMapperProject, :bar => {:$gt => 3, :$lt => 5}
+        MongoMapperProject.accessible_by(@ability, :edit).entries
+        lambda { MongoMapperProject.accessible_by(@ability, :edit).entries }.should raise_error
+      end
+
       it "should not modify the database" do
         obj = MongoMapperProject.create(:bar => 1)
         obj2 = MongoMapperProject.create(:bar => 2)
