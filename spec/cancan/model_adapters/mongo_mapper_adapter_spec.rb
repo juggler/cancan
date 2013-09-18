@@ -102,7 +102,6 @@ if ENV["MODEL_ADAPTER"] == "mongo_mapper"
 
         @ability.can :edit, MongoMapperProject
         @ability.cannot :edit, MongoMapperProject, :bar => {:$gt => 3, :$lt => 5}
-        MongoMapperProject.accessible_by(@ability, :edit).entries
         lambda { MongoMapperProject.accessible_by(@ability, :edit).entries }.should raise_error
       end
 
